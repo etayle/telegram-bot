@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 def start(update, context):
+    print('enter to start')
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please choose chapter ! \n command : /chapter NumOfChapter")
     
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -45,7 +46,8 @@ def echo(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(update.message.text)
 
 def chapter(update: Update, context: CallbackContext) -> None :
-    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + "/"
+    #link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + "/"
+    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-1029/"
     f = requests.get(link)
 
     string = f.text

@@ -14,7 +14,7 @@ Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
-
+ 
 import logging
 
 from telegram import Update, ForceReply, message
@@ -32,7 +32,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
+flag = True
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -51,23 +51,29 @@ def help_command(update: Update, context: CallbackContext) -> None:
     
 
 
-def search_scope(update: Update, context: CallbackContext) -> None:
+def search(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('the bot searching start')
+    global flag
+    flag = True
     regex = r"""<h2 class="blog-entry-title entry-title">(.*?)</h2><!-- .blog-entry-title -->"""
     link = "https://hoops.co.il/"
     last_scopse = []
     last_scopse_number = []
-    while True:
+    if context.args and context.args[0].isnumeric():
+        last_scopse_number.append(context.args[0])
+        print(last_scopse_number[0])
+    while flag:
             f = requests.get(link)
             string = BeautifulSoup(f.content)
             intCount =0
             for matchObj in re.finditer( regex, string.encode().decode(), re.M|re.I|re.S):
-                if intCount == 4:
+                if intCount == 5:
                     break
                 title =matchObj.group(0)[matchObj.group(0).find("title="):matchObj.group(0).find('</a>'):].strip('title="').split('">')[0]
                 link_of_scope = matchObj.group(0)[matchObj.group(0).find("https"):matchObj.group(0).find('" rel="bookmark"'):]
                 link_of_scope_number = link_of_scope.split('=')[-1]
+                print(link_of_scope_number)
                 if link_of_scope_number in last_scopse_number:
-                    time.sleep(15)
                     break
                     #want to return to while 
                 last_scopse_number.append(link_of_scope_number)
@@ -76,30 +82,26 @@ def search_scope(update: Update, context: CallbackContext) -> None:
             for scopes in last_scopse[::-1]:
                     update.message.bot.send_message(chat_id=-1001292728001, text=scopes, parse_mode = ParseMode.HTML)
             last_scopse.clear()
+            time.sleep(450)
     
-
-
-
-        
-
-            
-
-
+def stop(update: Update, context: CallbackContext) -> None:
+    global flag
+    flag = 0
+    update.message.reply_text('the bot stop')
 
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
+    updater = Updater(token='1988121128:AAEzMASC_64n9dZyXAf0XVAgStYcwdDQJIc', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(CommandHandler("search", search_scope))
-
-
+    dispatcher.add_handler(CommandHandler("start", start,run_async=True))
+    dispatcher.add_handler(CommandHandler("help", help_command,run_async=True))
+    dispatcher.add_handler(CommandHandler("search", search,run_async=True))
+    dispatcher.add_handler(CommandHandler("stop", stop,run_async=True))
     # Start the Bot
     updater.start_polling()
 
