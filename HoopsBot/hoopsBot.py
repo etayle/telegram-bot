@@ -92,7 +92,7 @@ def stop(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='1988121128:AAEzMASC_64n9dZyXAf0XVAgStYcwdDQJIc', use_context=True)
+    updater = Updater(token='TOUR TOKEN', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
