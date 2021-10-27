@@ -34,7 +34,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Create the Updater and pass it your bot's token.
-updater = Updater(token='1988121128:AAEzMASC_64n9dZyXAf0XVAgStYcwdDQJIc', use_context=True)
+updater = Updater(token='YOUR-TOKEN-HERE', use_context=True)
 job = updater.job_queue
 # Define a few command handlers. These usually take the two arguments update and
 # context.

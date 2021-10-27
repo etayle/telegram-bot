@@ -29,7 +29,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-bot = Bot(token='1933916173:AAE0Me-i42SyAFR8YA905sWAOjqynE9Vdw8')
+bot = Bot(token='YOR-TOKEN-HERE')
 
 
 # Enable logging
@@ -99,7 +99,7 @@ def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # its the RotterBot 
-    updater = Updater(token='1933916173:AAE0Me-i42SyAFR8YA905sWAOjqynE9Vdw8', use_context=True)
+    updater = Updater(token='YOUR-TOKEN-HERE', use_context=True)
     # want put the test bot
    # updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
     # Get the dispatcher to register handlers

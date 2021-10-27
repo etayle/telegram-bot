@@ -38,9 +38,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
-gc = gspread.service_account(filename= '/root/telegram_bot/Four-species/four-species-325810-093c62e6fccb.json')
+gc = gspread.service_account(filename= 'enter your json file here')
 
-sh = gc.open_by_key('1B5kqMI7IIHKCFgcvP2bbIXT03JDloynf_QYOQNphmt4').worksheet('w1')
+sh = gc.open_by_key('enter your key here').worksheet('w1')
 
 logger = logging.getLogger(__name__)
 
@@ -244,7 +244,7 @@ def end():
 def get_name_search(update: Update, context: CallbackContext) -> int:
     global order
     """Ask the user for info about the selected predefined choice."""
-    sh = gc.open_by_key('1B5kqMI7IIHKCFgcvP2bbIXT03JDloynf_QYOQNphmt4').worksheet('w1')
+    sh = gc.open_by_key('enter your key here').worksheet('w1')
     text = update.message.text
     max_rows = len(sh.get_all_values())
     find_row = None
@@ -269,7 +269,7 @@ def get_name_search(update: Update, context: CallbackContext) -> int:
 def get_phone_search(update: Update, context: CallbackContext) -> int:
     global order
     """Ask the user for info about the selected predefined choice."""
-    sh = gc.open_by_key('1B5kqMI7IIHKCFgcvP2bbIXT03JDloynf_QYOQNphmt4').worksheet('w1')
+    sh = gc.open_by_key('enter your key here').worksheet('w1')
     text = update.message.text
     max_rows = len(sh.get_all_values())
     find_row = None
@@ -299,7 +299,7 @@ def done(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
+    updater = Updater(token='YOUR-TOKEN-HERE', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
