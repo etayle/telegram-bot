@@ -47,7 +47,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 def chapter(update: Update, context: CallbackContext) -> None :
     #link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + "/"
-    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-1029/"
+    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-1031/"
     f = requests.get(link)
 
     string = f.text
@@ -64,7 +64,7 @@ def chapter(update: Update, context: CallbackContext) -> None :
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='YOUR_TOKEN_HERE', use_context=True)
+    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

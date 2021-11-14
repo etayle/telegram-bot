@@ -1,5 +1,6 @@
 
 
+
 #!/usr/bin/env python
 # pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
@@ -39,7 +40,19 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def get_chunks(s, maxlength):
+    start = 0
+    end = 0
+    while start + maxlength  < len(s) and end != -1:
+        end = s.rfind(" ", start, start + maxlength + 1)
+        yield s[start:end]
+        start = end +1
+    yield s[start:]
 
+def replace_all(text, l):
+    for i in l:
+        text = text.replace(i, "")
+    return text
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -55,41 +68,41 @@ def help_command(update: Update, context: CallbackContext) -> None:
         return 
     update.message.reply_text('Help!')
     
-
-def search_scope(update: Update, context: CallbackContext) -> None:
-    """search for new scopes and send to the channel the user message."""
-    if update.message.from_user.id != 92203167:
+def search(update: Update, context: CallbackContext) -> None:
+    if update.message.chat_id == -1001573574395  and update.message.from_user.id == 777000  :
+            message_id = update.message.message_id
+            update_messege = update.message.text 
+            link = update_messege[update_messege.find("https://rotter.net/forum/scoops1/")::]
+            regex = r"""<!--<FONT CLASS='text16b'>-->(.*?)<!-- /69589285/Threads_Below_Main_Content -->"""
+            f = requests.get(link)
+            string = BeautifulSoup(f.content,features="lxml")
+            for matchObj in re.finditer( regex, string.encode().decode(), re.M|re.I|re.S):
+                sub_text = matchObj.group(0)
+                sub_text = sub_text[sub_text.find("text15")::]
+                sub_text = sub_text[sub_text.find("<br/>")::]
+            soup = BeautifulSoup(sub_text, features="html.parser")
+            # kill all script and style elements
+            for script in soup(["script", "style"]):
+                script.extract()    # rip it out
+            # get text
+            text = soup.get_text()
+            # break into lines and remove leading and trailing space on each
+            lines = (line.strip() for line in text.splitlines())
+            # break multi-headlines into a line each
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            # drop blank lines
+            string = '\n'.join(chunk for chunk in chunks if chunk)
+            n = 2000 # chunk length
+            chunks = [string[i:i+n] for i in range(0, len(string), n)]
+            for mess in chunks:
+                  if mess:
+                    update.message.bot.send_message(chat_id=-1001573574395, text=mess, parse_mode = ParseMode.HTML ,reply_to_message_id = message_id)
+                    time.sleep(0.2)
+            images = soup.findAll('img')
+            for image in images:
+                context.bot.send_photo(chat_id=-1001573574395, photo=image['src'],reply_to_message_id = message_id)
+    else : 
         return 
-    link = "https://rotter.net/forum/listforum.php"
-    regex = r"""<td align="right" valign="TOP" width="70%"><font class="text15bn" face="Arial"><a href=(.*?)</b></a>"""
-    last_scopse = []
-    last_scopse_number = []
-    while True:
-        f = requests.get(link)
-        string = BeautifulSoup(f.content)
-        intCount =0
-        for matchObj in re.finditer( regex, string.encode().decode(), re.M|re.I|re.S):
-            if intCount == 4:
-                break
-            link_of_scope = matchObj.group(0)[matchObj.group(0).find("https"):matchObj.group(0).find('" target'):]
-            link_of_scope_number = int(link_of_scope.strip(".shtml").split('/')[5])
-            link_to_mobile = 'https://rotter.net/mobile/viewmobile.php?thread=' + str(link_of_scope_number)
-            link_to_mobile = ' <a href="' + link_to_mobile + '">קישור למובייל</a>' 
-            if link_of_scope_number in last_scopse_number:
-                time.sleep(15)
-                break
-                #want to return to while 
-            last_scopse_number.append(link_of_scope_number)
-            text = matchObj.group(0)[matchObj.group(0).find("<b>"):matchObj.group(0).find('</a>'):].strip('<b>').strip('</b>')
-            last_scopse.append(text + '\n\n' + link_to_mobile + '\n' + 'קישור לסקופ :' +'\n' + link_of_scope + '\n'  )
-            intCount+=1
-        for scopes in last_scopse[::-1]:
-               update.message.bot.send_message(chat_id=-1001215937698, text=scopes, parse_mode = ParseMode.HTML)
-               time.sleep(1)
-               break
-        if 150 < len(link_of_scope_number):
-            link_of_scope_number = link_of_scope_number[-20::] 
-        last_scopse.clear()
 
 def server_error(e):
     logging.exception('An error occurred during a request.')
@@ -104,13 +117,15 @@ def main() -> None:
     # its the RotterBot 
     updater = Updater(token='YOUR-TOKEN', use_context=True)
     # want put the test bot
+    # updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start,run_async=True))
     dispatcher.add_handler(CommandHandler("help", help_command,run_async=True))
-    dispatcher.add_handler(CommandHandler("search", search_scope,run_async=True))
+    dispatcher.add_handler(CommandHandler("test", search,run_async=True))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, search))
     # Start the Bot
     updater.start_polling()
 
