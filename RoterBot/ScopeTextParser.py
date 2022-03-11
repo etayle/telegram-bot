@@ -35,6 +35,7 @@ def replace_all(text, l):
         text = text.replace(i, "")
     return text
 from flask import Flask
+
 link = "https://rotter.net/forum/scoops1/721353.shtml"
 regex = r"""<!--<FONT CLASS='text16b'>-->(.*?)<!-- /69589285/Threads_Below_Main_Content -->"""
 f = requests.get(link)
@@ -65,5 +66,4 @@ text = '\n'.join(chunk for chunk in chunks if chunk)
 n = 2000 # chunk length
 chunks = [text[i:i+n] for i in range(0, len(text), n)]
 for mess in chunks:
-        #print(mess)
-        pass
+        print(mess)

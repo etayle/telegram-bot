@@ -14,6 +14,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 #!/usr/bin/python
+import time
 import re
 import requests
 
@@ -33,7 +34,6 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 def start(update, context):
-    print('enter to start')
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please choose chapter ! \n command : /chapter NumOfChapter")
     
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -41,30 +41,30 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Help!')
 
 
-def echo(update: Update, context: CallbackContext) -> None:
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
 
 def chapter(update: Update, context: CallbackContext) -> None :
-    #link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + "/"
-    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-1031/"
+    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0]
     f = requests.get(link)
 
     string = f.text
 
-    regex = r"""<ima?ge?(?=\s|>)(?=(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*?\ssrc=(['"]?)(.*?)\1(?:\s|>))(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>""";
-
+    #regex = r"""<ima?ge?(?=\s|>)(?=(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*?\ssrc=(['"]?)(.*?)\1(?:\s|>))(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>""";
+    regex = r"""(^<meta +property="og:image(?::url)?" +content="([^"]+)" *\/>$)""";
     intCount = 0
-    print(context.args[0])
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
+        print(matchObj.group(2))
         context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
+        time.sleep(0.2)
         intCount+=1
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Finish to send this chapter")
+    print('finish to send this chpater')
+
 
 
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
+    updater = Updater(token='', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -73,9 +73,6 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("chapter",chapter))
-
-    # on non command i.e message - echo the message on Telegram
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the Bot
     updater.start_polling()
