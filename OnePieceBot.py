@@ -43,7 +43,8 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 
 def chapter(update: Update, context: CallbackContext) -> None :
-    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0]
+    #link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0]
+    link = "https://www.onepiece-manga-online.net/manga/one-piece-manga-chapter-1045/"
     f = requests.get(link)
 
     string = f.text
@@ -53,7 +54,10 @@ def chapter(update: Update, context: CallbackContext) -> None :
     intCount = 0
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
         print(matchObj.group(2))
-        context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
+        try:
+            context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
+        except:
+            continue
         time.sleep(0.2)
         intCount+=1
     context.bot.send_message(chat_id=update.effective_chat.id, text="Finish to send this chapter")
@@ -64,7 +68,7 @@ def chapter(update: Update, context: CallbackContext) -> None :
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='', use_context=True)
+    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
