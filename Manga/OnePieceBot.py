@@ -14,6 +14,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 #!/usr/bin/python
+from pydoc import text
 import time
 import re
 import requests
@@ -22,7 +23,9 @@ import logging
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from bs4 import BeautifulSoup
 
+dontAvaliabe = 'This Chapter is not available Yet. We will add it soon. When it Available'
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -34,21 +37,48 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please choose chapter ! \n command : /chapter NumOfChapter")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please choose chapter ! \n " + 
+     'command : /chapter NumOfChapter \n /last for last chapter')
     
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
+def last(update: Update, context: CallbackContext) -> None :
+    link = "https://www.onepiece-manga-online.net"
+    f = requests.get(link)
+    string = f.text
+    soup = BeautifulSoup(string, "html.parser")
+    string = f.text
+    regex = r"""https:\/\/w1\.onepiece-manga-online\.net\/manga\/one-piece-manga-chapter-[0-9]*?\/""";
 
+    for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
+        link = matchObj.group(0)
+        f = requests.get(link)
+        string = f.text
+        soup = BeautifulSoup(string, "html.parser")
+        if dontAvaliabe in string:
+            continue
+        textToSend = 'send chapter ' +  re.findall(r'\d+',link)[-1]
+        context.bot.send_message(chat_id=update.effective_chat.id, text=textToSend)
+        print(textToSend)
+        regex = r"""(^<meta +property="og:image(?::url)?" +content="([^"]+)" *\/>$)""";
+        intCount = 0
+
+        for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
+            context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
+            print(matchObj.group(2))
+        print('finish to send this chpater')
+        return
 
 def chapter(update: Update, context: CallbackContext) -> None :
-    #link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0]
-    link = "https://www.onepiece-manga-online.net/manga/one-piece-manga-chapter-1045/"
+    link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + '/'
     f = requests.get(link)
-
     string = f.text
-
+    if dontAvaliabe in string:
+        print("This chapter dont available")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="This chapter dont available")
+        return
     #regex = r"""<ima?ge?(?=\s|>)(?=(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*?\ssrc=(['"]?)(.*?)\1(?:\s|>))(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>""";
     regex = r"""(^<meta +property="og:image(?::url)?" +content="([^"]+)" *\/>$)""";
     intCount = 0
@@ -68,7 +98,7 @@ def chapter(update: Update, context: CallbackContext) -> None :
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='', use_context=True)
+    updater = Updater(token='ENTER YOUR TOKEN', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -77,6 +107,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("chapter",chapter))
+    dispatcher.add_handler(CommandHandler("last",last))
 
     # Start the Bot
     updater.start_polling()
@@ -88,4 +119,5 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    
     main()
