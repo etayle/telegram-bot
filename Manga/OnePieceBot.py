@@ -54,6 +54,7 @@ def last(update: Update, context: CallbackContext) -> None :
 
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
         link = matchObj.group(0)
+        print(link)
         f = requests.get(link)
         string = f.text
         soup = BeautifulSoup(string, "html.parser")
@@ -66,8 +67,12 @@ def last(update: Update, context: CallbackContext) -> None :
         intCount = 0
 
         for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
-            context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
-            print(matchObj.group(2))
+            try:
+                print(matchObj.group(2))
+                context.bot.send_photo(update.effective_chat.id, matchObj.group(2))
+            except:
+                errorMsg = 'failed occur when try send the img:\n' +  matchObj.group(2) 
+                context.bot.send_message(chat_id=update.effective_chat.id, text=errorMsg)
         print('finish to send this chpater')
         return
 

@@ -57,11 +57,4 @@ def get_theather_movies(theatherID):
             pass
     return ret_list
 
-#link ="https://www.cinema-city.co.il/tickets/Events?TheatreId=1170&VenueTypeId=1&MovieId=4200&Date=0"
-#for movie in get_theather_movies(theater['ראשל"צ']):
-#    pprint.pprint(movie.title)
-#    pprint.pprint(movie.movieID)
-#    pprint.pprint(movie.date)
-#m = parse_event(link)
-
     
