@@ -38,19 +38,19 @@ logger = logging.getLogger(__name__)
 # context.
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please choose chapter ! \n " + 
-     'command : /chapter NumOfChapter \n /last for last chapter')
+     'commands :+\n/chapter NumOfChapter \n/last to get last chapter available\n/sendlast to send the last chapters available')
     
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
-def last(update: Update, context: CallbackContext) -> None :
+def sendlast(update: Update, context: CallbackContext) -> None :
     link = "https://www.onepiece-manga-online.net"
     f = requests.get(link)
     string = f.text
     soup = BeautifulSoup(string, "html.parser")
     string = f.text
-    regex = r"""https:\/\/w1\.onepiece-manga-online\.net\/manga\/one-piece-manga-chapter-[0-9]*?\/""";
+    regex = r"""https:\/\/w2\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
 
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
         link = matchObj.group(0)
@@ -76,6 +76,26 @@ def last(update: Update, context: CallbackContext) -> None :
         print('finish to send this chpater')
         return
 
+def last(update: Update, context: CallbackContext) -> None :
+    link = "https://www.onepiece-manga-online.net"
+    f = requests.get(link)
+    string = f.text
+    soup = BeautifulSoup(string, "html.parser")
+    string = f.text
+    regex = r"""https:\/\/w2\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
+
+    for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
+        link = matchObj.group(0)
+        print(link)
+        f = requests.get(link)
+        string = f.text
+        soup = BeautifulSoup(string, "html.parser")
+        if dontAvaliabe in string:
+            continue
+        textToSend = 'available chapter ' +  re.findall(r'\d+',link)[-1]
+        context.bot.send_message(chat_id=update.effective_chat.id, text=textToSend)
+        print(textToSend)
+    
 def chapter(update: Update, context: CallbackContext) -> None :
     link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + '/'
     f = requests.get(link)
@@ -113,6 +133,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("chapter",chapter))
     dispatcher.add_handler(CommandHandler("last",last))
+    dispatcher.add_handler(CommandHandler("sendlast",sendlast))
 
     # Start the Bot
     updater.start_polling()
