@@ -95,6 +95,7 @@ def last(update: Update, context: CallbackContext) -> None :
         textToSend = 'available chapter ' +  re.findall(r'\d+',link)[-1]
         context.bot.send_message(chat_id=update.effective_chat.id, text=textToSend)
         print(textToSend)
+        break
     
 def chapter(update: Update, context: CallbackContext) -> None :
     link = "https://onepiece-manga-online.net/manga/one-piece-chapter-" + context.args[0] + '/'
