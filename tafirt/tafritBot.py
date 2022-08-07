@@ -1,5 +1,5 @@
 import imp
-from  my_gmail import get_my_email_attachment
+import my_gmail
 
 
 #!/usr/bin/env python
@@ -44,14 +44,36 @@ def start(update, context):
     
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text("""
+bot to get attachments from gmail: etayle10@gmail.com:
+commands:
+/send_last_photo: get the newst attachments the mail get in the last month
+/send_photo_by_title arg_title
+get the fist attachments to with specified title in the last month""")
 
-def send_photo(update: Update, context: CallbackContext) -> None:
+def send_last_photo(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    photo_path = get_my_email_attachment()
-    print(photo_path)
-    context.bot.send_photo(update.effective_chat.id, photo=open(photo_path,'rb') )
-    os.remove(photo_path)
+    is_valid, photo_path = my_gmail.get_my_email_last_attachment()
+    if is_valid:
+        print(photo_path)
+        context.bot.send_photo(update.effective_chat.id, photo=open(photo_path,'rb') )
+        os.remove(photo_path)
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text='not get a new attachment in the last month')
+
+def send_photo_by_title(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /help is issued."""
+    if 0 < len(context.args):
+        subject =  " ".join(context.args)
+        is_valid, photo_path = my_gmail.get_my_email_attachment_by_title(subject)
+        if is_valid:
+            print(photo_path)
+            context.bot.send_photo(update.effective_chat.id, photo=open(photo_path,'rb') )
+            os.remove(photo_path)
+        else:
+            context.bot.send_message(chat_id=update.effective_chat.id, text='not get a new attachment in the last month')
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text='error: No argument given see /help for correct usage')
 
 
 def main() -> None:
@@ -65,7 +87,8 @@ def main() -> None:
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(CommandHandler("test", send_photo))
+    dispatcher.add_handler(CommandHandler("send_last_photo", send_last_photo))
+    dispatcher.add_handler(CommandHandler("send_photo_by_title", send_photo_by_title))
 
     # Start the Bot
     updater.start_polling()

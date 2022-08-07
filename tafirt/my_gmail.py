@@ -18,8 +18,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 def get_lables(service, user_id):
     return  service.users().labels().list(userId=user_id).execute()
 
-def get_messages(service, user_id):
-  my_query = 'after:{}'.format(datetime.today().strftime('%Y-%m-%d'))
+def get_messages(service, user_id,my_query):
   try:
     return service.users().messages().list(userId=user_id,q=my_query).execute()
   except Exception as error:
@@ -56,11 +55,19 @@ def get_attachments(service, user_id, msg_id, store_dir):
         f = open(path, 'wb')
         f.write(file_data)
         f.close()
-        return path
+        return True,path
+    return False,None
   except Exception as error:
     print('An error occurred: %s' % error)
-    return False
-def get_my_email_attachment():
+    return False,None
+  
+def get_last_month():
+    now = datetime.now()
+    last_month = now.month-1 if now.month > 1 else 12
+    query = 'after:{}-0{}-01'.format(now.year,last_month)
+    return query
+
+def get_my_email_attachment_by_title(subject,query= get_last_month()): 
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
@@ -84,19 +91,60 @@ def get_my_email_attachment():
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
-        msgs = get_messages(service,'me')
+        msgs = get_messages(service,'me',query)
         if msgs['resultSizeEstimate'] ==0:
             return None
         for msgid in msgs['messages']:
                 msg = get_mime_message(service,'me',msgid['id'])
-                if  msg['Subject'].split()[0] == 'tafrit':
+                msg_subject = msg['Subject']
+                print(msg_subject)
+                if  msg_subject == subject:
                     return get_attachments(service,'me',msgid['id'],'./')
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f'An error occurred: {error}')
+        
+
+def get_my_email_last_attachment(query=get_last_month()):
+    """Shows basic usage of the Gmail API.
+    Lists the user's Gmail labels.
+    """
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+    try:
+        # Call the Gmail API
+        service = build('gmail', 'v1', credentials=creds)
+        msgs = get_messages(service,'me',query)
+        if msgs['resultSizeEstimate'] ==0:
+            return None
+        for msgid in msgs['messages']:
+                    is_have_attachments,path = get_attachments(service,'me',msgid['id'],'./')
+                    if is_have_attachments:
+                        return is_have_attachments,path
+        return False,None
+    except HttpError as error:
+        # TODO(developer) - Handle errors from gmail API.
+        print(f'An error occurred: {error}')
+        return False,None
   
 def main():
-    get_my_email_attachment()
+    query = 'after:2022-08-05'
+    get_my_email_last_attachment(query)
 
 if __name__ == '__main__':
     main()
