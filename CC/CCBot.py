@@ -21,7 +21,6 @@ from multiprocessing import Event
 import requests
 from bs4 import BeautifulSoup
 import re
-from selenium import webdriver
 from telegram import(
     ReplyKeyboardMarkup,
     Update,

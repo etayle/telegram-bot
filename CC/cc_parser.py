@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import pandas
-from selenium import webdriver
 import pprint
 
 regex = r"""[\u0590-\u05FF\uFB1D-\uFB4F]+""";
