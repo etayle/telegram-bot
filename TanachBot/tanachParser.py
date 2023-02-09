@@ -19,8 +19,8 @@ def getSeder(single_date):
     link = "https://www.tanachyomi.co.il/getDateInfo2?gd={day}&gm={month}&gy={year}&s=".format(day=single_date.strftime("%d"), month = single_date.strftime("%m"), year = single_date.strftime("%Y") )
     f = requests.get(link)
     html  = BeautifulSoup(f.content,features="html.parser")
-    jsonData = json.loads(html.text)
-    link2 = "https://he.m.wikisource.org/wiki/" +  Books[int(jsonData['sederBook'])] + "/" + "סדר_"  + hebNumClean[int(jsonData['sederPart'])].replace("'","") 
+    jsonData = json.loads(html.text) 
+    link2 = "https://he.m.wikisource.org/wiki/" +  Books[int(jsonData['sederBook'])] + "/" + "סדר_"  + hebNumClean[int(jsonData['sederPart'].split(".")[0])].replace("'","")
     f = requests.get(link2)
     soup  = BeautifulSoup(f.content,features="html.parser")
     string = f.text

@@ -79,7 +79,7 @@ def send_photo_by_title(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token='', use_context=True)
+    updater = Updater(token='397823070:AAFAnRP2RwlpU_TC_QFnzhociPceODt6eus', use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

@@ -144,6 +144,7 @@ def get_my_email_last_attachment(query=get_last_month()):
   
 def main():
     query = 'after:2022-08-05'
+
     get_my_email_last_attachment(query)
 
 if __name__ == '__main__':

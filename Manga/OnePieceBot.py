@@ -50,7 +50,7 @@ def sendlast(update: Update, context: CallbackContext) -> None :
     string = f.text
     soup = BeautifulSoup(string, "html.parser")
     string = f.text
-    regex = r"""https:\/\/w2\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
+    regex = r"""https:\/\/w[0-9]\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
 
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
         link = matchObj.group(0)
@@ -82,7 +82,7 @@ def last(update: Update, context: CallbackContext) -> None :
     string = f.text
     soup = BeautifulSoup(string, "html.parser")
     string = f.text
-    regex = r"""https:\/\/w2\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
+    regex = r"""https:\/\/w[0-9]\.onepiece-manga-online\.net\/manga\/one-piece(-manga)?-chapter-[0-9]*?\/""";
 
     for matchObj in re.finditer( regex, string, re.M|re.I|re.S):
         link = matchObj.group(0)
@@ -92,7 +92,9 @@ def last(update: Update, context: CallbackContext) -> None :
         soup = BeautifulSoup(string, "html.parser")
         if dontAvaliabe in string:
             continue
-        textToSend = 'available chapter ' +  re.findall(r'\d+',link)[-1]
+        dateModifed = soup.find("meta", {"property":"article:modified_time"})
+        dateModifed = "-".join(dateModifed['content'].split('T')[0].split('-')[::-1])
+        textToSend = 'Available chapter ' +  re.findall(r'\d+',link)[-1] + ' modifed at: ' +  dateModifed
         context.bot.send_message(chat_id=update.effective_chat.id, text=textToSend)
         print(textToSend)
         break
